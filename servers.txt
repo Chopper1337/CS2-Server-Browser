@@ -2,7 +2,7 @@ FR, Home-Network Deathmatch Classic, home-network.ovh, 27015, Deathmatch
 FR, Home-Network Deathmatch Only HS, home-network.ovh, 27020, Deathmatch
 FR, Home-Network Competitive Server 1, home-network.ovh, 27018, Deathmatch
 FR, Home-Network Competitive Server 2, home-network.ovh, 27019, Deathmatch
-EN, oof.lv Competitive Server 1, cs2.oof.lv, 27015, Competitve
+EN, oof.lv Competitive Server 1, cs2.oof.lv, 27015, Competitive
 EN, oof.lv Deathmatch Classic Server 1, cs2.oof.lv, 27016, Deathmatch
 CA, bat420.com Competitive, cs2.bat420.com, 27015, Competitive
 CA, bat420.com Competitive [Inferno_classic], cs2.bat420.com, 27016, Competitive
