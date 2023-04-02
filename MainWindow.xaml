@@ -14,7 +14,9 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
         materialDesign:ThemeAssist.Theme="Dark"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        MinWidth="600" MinHeight="350"
+        Loaded="Window_Loaded">
     <Grid>
     <Grid.RowDefinitions>
         <RowDefinition Height="7*"></RowDefinition>
@@ -29,11 +31,8 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Style="{DynamicResource MaterialDesignBody1TextBlock}" Margin="10" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center" Foreground="AliceBlue">Thanks to Kfalt.exe for not obfuscating their code :) </TextBlock>
-            <Button Grid.Column="1" Content="Connect" Click="Connect" Name="ConnectBtn" Margin="10"></Button>
-            <Grid Grid.Column="2">
+            <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
@@ -43,12 +42,22 @@
                 </Grid.ColumnDefinitions>
                 <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">Threads</Label>
                 <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">Frequency</Label>
-                <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">Priority</Label>
-                <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">Language</Label>
-                <ComboBox Grid.Row="0" Grid.Column="1" Margin="2" VerticalAlignment="Center" Name="ThreadsComboBox"></ComboBox>
-                <ComboBox Grid.Row="1" Grid.Column="1" Margin="2" VerticalAlignment="Center" Name="FreqComboBox"></ComboBox>
-                <ComboBox Grid.Row="2" Grid.Column="1" Margin="2" VerticalAlignment="Center" Name="PriorityComboBox"></ComboBox>
-                <ComboBox Grid.Row="3" Grid.Column="1" Margin="2" VerticalAlignment="Center" Name="LanguageComboBox"></ComboBox>
+                <ComboBox Grid.Row="0" Grid.Column="1" Margin="2" VerticalAlignment="Center" Name="ThreadsComboBox" SelectionChanged="SettingChanged"></ComboBox>
+                <ComboBox Grid.Row="1" Grid.Column="1" Margin="2" VerticalAlignment="Center" Name="FreqComboBox" SelectionChanged="SettingChanged"></ComboBox>
+            </Grid>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*"></ColumnDefinition>
+                    <ColumnDefinition Width="6*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">Priority</Label>
+                <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">Language</Label>
+                <ComboBox Grid.Row="0" Grid.Column="1" Margin="2" VerticalAlignment="Center" Name="PriorityComboBox" SelectionChanged="SettingChanged"></ComboBox>
+                <ComboBox Grid.Row="1" Grid.Column="1" Margin="2" VerticalAlignment="Center" Name="LanguageComboBox" SelectionChanged="SettingChanged"></ComboBox>
             </Grid>
         </Grid>
 

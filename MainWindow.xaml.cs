@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,40 +22,136 @@ namespace CS2_Server_Browser
     /// </summary>
     public partial class MainWindow : Window
     {
-        //List of servers
+        // List of servers
         List<Server> servers = new List<Server>();
+
+        // Relative path to CS2 executable
+        string gameExecutable = "bin\\win64\\cs2.exe";
+
+        private bool ready = false;
+
+        // List of priority levels
+        List<string> priorityLevels = new List<string>
+        {
+            "High",
+            "Normal",
+            "Low"
+        };
+
+        // List of languages
+        List<string> languages = new List<string>
+        {
+            "English",
+            "French",
+            "German",
+            "Italian",
+            "Spanish",
+            "Polish",
+            "Portuguese",
+            "Russian",
+            "Korean",
+            "Japanese",
+            "Chinese",
+            "Thai",
+            "Vietnamese",
+            "Bulgarian",
+            "Czech",
+            "Danish",
+            "Dutch",
+            "Finnish",
+            "Greek",
+            "Hungarian",
+            "Norwegian",
+            "Romanian",
+            "Swedish",
+            "Turkish",
+            "Ukrainian"
+        };
+
+        // List of valid monitor frequencies
+        List<string> monitorFrequencies = new List<string>
+        {
+            "60",
+            "75",
+            "85",
+            "100",
+            "120",
+            "144",
+            "165",
+            "240",
+            "360"
+        };
 
         public MainWindow()
         {
             InitializeComponent();
-
-            //Make the DataGrid show the servers
-            foreach (Server server in servers)
-            {
-                ServerDataGrid.Items.Add(server);
-            }
 
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Location", Binding = new Binding("location") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("name") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "IP", Binding = new Binding("ip") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Gamemode", Binding = new Binding("gamemode") });
 
+            PriorityComboBox.ItemsSource = priorityLevels;
+            LanguageComboBox.ItemsSource = languages;
+            FreqComboBox.ItemsSource = monitorFrequencies;
+            ThreadsComboBox.ItemsSource = FindThreads();
+
+            // Set saved values
+            PriorityComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Priority;
+            LanguageComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Language;
+            FreqComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Frequency;
+            ThreadsComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Threads;
+
+            ready = true;
+
         }
+
+        // Find how many threads the CPU has and add them to the combobox
+        private List<string> FindThreads()
+        {
+            int threadCount = Environment.ProcessorCount;
+            List<string> threadList = new List<string>();
+            for (int i = 1; i <= threadCount; i++)
+            {
+                threadList.Add(i.ToString());
+            }
+            return threadList;
+        }
+
+        // Verify executable file
+        private bool VerifyGameExecutable()
+        {
+            if (!File.Exists(gameExecutable))
+            {
+                MessageBox.Show("CS2.exe not found!");
+                return false;
+            }
+
+            return true;
+        }   
 
         // Fill the "servers" list with servers from a file named "servers.txt"
         private void LoadServers(object sender, RoutedEventArgs e)
         {
             StreamReader reader = new StreamReader("servers.txt");
             // For each line in the file, create a new server and add it to the list
-            foreach (string line in File.ReadLines("servers.txt"))
+            foreach (var line in File.ReadLines("servers.txt"))
             {
-                string[] serverData = line.Split(',');
-                Server server = new Server();
-                server.name = serverData[0];
-                server.ip = serverData[1];
-                server.gamemode = (Gamemode)Enum.Parse(typeof(Gamemode), serverData[2]);
-                server.location = serverData[3];
+                var serverData = line.Split(',');
+                var server = new Server
+                {
+                    name = serverData[0],
+                    ip = serverData[1],
+                    gamemode = (Gamemode)Enum.Parse(typeof(Gamemode), serverData[2]),
+                    location = serverData[3]
+                };
                 servers.Add(server);
+            }
+
+            //Make the DataGrid show the servers
+            foreach (Server server in servers)
+            {
+                ServerDataGrid.Items.Add(server);
             }
         }
 
@@ -69,13 +166,13 @@ namespace CS2_Server_Browser
 
         public void StartGame(string threads, string freq, string lang, string priority, string ip)
         {
-            string arguments = "-insecure -threads " + threads + " -freq " + freq +
-                        " -nojoy -belowaverage -fullscreen -limitvsconst -forcenovsync -softparticlesdefaultoff -console -language " +
-                        lang + " -novid -" + priority + " +connect " + ip;
+            string arguments = "-insecure -threads " + threads + " -freq " + freq + " -nojoy -belowaverage -fullscreen -limitvsconst -forcenovsync -softparticlesdefaultoff -console -language " + lang + " -novid -" + priority + " +connect " + ip;
+            Process.Start(gameExecutable, arguments);
         }
 
         private void Connect(object sender, RoutedEventArgs e)
         {
+            if (!VerifyGameExecutable()) return;
             if(!(ServerDataGrid.SelectedItem is Server selectedServer)) return;
             string ip = selectedServer.ip;
             string threads = ThreadsComboBox.SelectedValue.ToString().Split(':')[0];
@@ -85,6 +182,17 @@ namespace CS2_Server_Browser
             StartGame(threads, freq, lang, priority, ip);
             
             MessageBox.Show("Connecting to " + selectedServer.ip);
+        }
+
+        // Save settings when the window is closed
+        private void SettingChanged(object sender, RoutedEventArgs e)
+        {
+            if (!ready) return;
+            CS2_Server_Browser.Properties.Settings.Default.Priority = PriorityComboBox.SelectedValue.ToString();
+            CS2_Server_Browser.Properties.Settings.Default.Language = LanguageComboBox.SelectedValue.ToString();
+            CS2_Server_Browser.Properties.Settings.Default.Frequency = FreqComboBox.SelectedValue.ToString();
+            CS2_Server_Browser.Properties.Settings.Default.Threads = ThreadsComboBox.SelectedValue.ToString();
+            CS2_Server_Browser.Properties.Settings.Default.Save();
         }
     }
 }
