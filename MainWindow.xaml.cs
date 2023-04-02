@@ -147,7 +147,8 @@ namespace CS2_Server_Browser
                 {
                     name = serverData[0],
                     ip = serverData[1],
-                    gamemode = (Gamemode)Enum.Parse(typeof(Gamemode), serverData[2]),
+                    port = serverData[2],
+                    gamemode = (Gamemode)Enum.Parse(typeof(Gamemode), serverData[3]),
                     location = FindLocation(serverData[1]),
                     status = Ping(serverData[1])
                 };
@@ -171,9 +172,9 @@ namespace CS2_Server_Browser
                 LoadServers(sender, e);
         }
 
-        public void StartGame(string threads, string freq, string lang, string priority, string ip)
+        public void StartGame(string threads, string freq, string lang, string priority, string ip, string port)
         {
-            string arguments = "-insecure -threads " + threads + " -freq " + freq + " -nojoy -belowaverage -fullscreen -limitvsconst -forcenovsync -softparticlesdefaultoff -console -language " + lang + " -novid -" + priority + " +connect " + ip;
+            string arguments = "-insecure -threads " + threads + " -freq " + freq + " -nojoy -belowaverage -fullscreen -limitvsconst -forcenovsync -softparticlesdefaultoff -console -language " + lang + " -novid -" + priority + $" +connect {ip}:{port}";
             Process.Start(gameExecutable, arguments);
         }
 
@@ -182,11 +183,12 @@ namespace CS2_Server_Browser
             if (!VerifyGameExecutable()) return;
             if(!(ServerDataGrid.SelectedItem is Server selectedServer)) return;
             string ip = selectedServer.ip;
+            string port = selectedServer.port;
             string threads = ThreadsComboBox.SelectedValue.ToString().Split(':')[0];
             string freq = FreqComboBox.SelectedValue.ToString().Split(':')[0];
             string lang = LanguageComboBox.SelectedValue.ToString().Split(':')[0];
             string priority = PriorityComboBox.SelectedValue.ToString().Split(':')[0];
-            StartGame(threads, freq, lang, priority, ip);
+            StartGame(threads, freq, lang, priority, ip, port);
             
             MessageBox.Show("Connecting to " + selectedServer.ip);
         }

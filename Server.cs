@@ -10,6 +10,7 @@ namespace CS2_Server_Browser
     {
         public string name { get; set; }
         public string ip { get; set; }
+        public string port { get; set; }
         public Gamemode gamemode { get; set; }
         public string location { get; set; }
         public Status status { get; set; }
