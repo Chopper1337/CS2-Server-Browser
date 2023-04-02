@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS2-Server-Browser", "CS2-Server-Browser.csproj", "{BEEFF5D2-2CF9-4CA2-AB0E-CC3C5FA90DBF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BEEFF5D2-2CF9-4CA2-AB0E-CC3C5FA90DBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEEFF5D2-2CF9-4CA2-AB0E-CC3C5FA90DBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEEFF5D2-2CF9-4CA2-AB0E-CC3C5FA90DBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEEFF5D2-2CF9-4CA2-AB0E-CC3C5FA90DBF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B5F928A7-44AE-4B48-99FA-48DBBF571D1F}
+	EndGlobalSection
+EndGlobal
