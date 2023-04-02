@@ -13,6 +13,8 @@ namespace CS2_Server_Browser
     // TODO: Add a "Refresh" button to refresh the server list which downloads the latest version of servers.txt from Github
     // TODO: Query server information from the server itself such that only the server's IP and port is needed in servers.txt
     // TODO: Configurable launch options (Checkboxes for some settings, ComboBoxes, TextBoxes etc.)
+    // TODO: Verify CS2 supported languages
+    // TODO: List monitor frequencies based on the monitor connected to the PC
 
     public partial class MainWindow : Window
     {
