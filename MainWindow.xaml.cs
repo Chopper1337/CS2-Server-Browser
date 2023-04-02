@@ -9,9 +9,11 @@ using System.Windows.Data;
 
 namespace CS2_Server_Browser
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+    // TODO: Ping servers and show status in a way that actually works
+    // TODO: Add a "Refresh" button to refresh the server list which downloads the latest version of servers.txt from Github
+    // TODO: Query server information from the server itself such that only the server's IP and port is needed in servers.txt
+    // TODO: Configurable launch options (Checkboxes for some settings, ComboBoxes, TextBoxes etc.)
+
     public partial class MainWindow : Window
     {
         // List of servers
@@ -79,11 +81,13 @@ namespace CS2_Server_Browser
             InitializeComponent();
 
             StatusMessageTextBlock.Text = "Loading list headers...";
-            ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Location", Binding = new Binding("location") });
+            ServerDataGrid.Columns.Add(
+                new DataGridTextColumn { Header = "Location", Binding = new Binding("location") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("name") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "IP", Binding = new Binding("ip") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Port", Binding = new Binding("port") });
-            ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Gamemode", Binding = new Binding("gamemode") });
+            ServerDataGrid.Columns.Add(
+                new DataGridTextColumn { Header = "Gamemode", Binding = new Binding("gamemode") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Status", Binding = new Binding("status") });
 
             PriorityComboBox.ItemsSource = priorityLevels;
@@ -115,6 +119,7 @@ namespace CS2_Server_Browser
             {
                 threadList.Add(i.ToString());
             }
+
             return threadList;
         }
 
@@ -146,9 +151,9 @@ namespace CS2_Server_Browser
                     name = serverData[1],
                     ip = serverData[2],
                     port = serverData[3],
+                    status = Ping(serverData[2].Trim()),
                     gamemode = (Gamemode)Enum.Parse(typeof(Gamemode), serverData[4])
                 };
-
                 servers.Add(server);
             }
 
@@ -158,6 +163,26 @@ namespace CS2_Server_Browser
                 ServerDataGrid.Items.Add(server);
             }
         }
+
+
+        // Ping the selected server and return its status (Online/Offline)
+        public Status Ping(string ip)
+        {
+            try
+            {
+                using (var client = new WebClient())
+                // TODO: Find a better way to ping the server
+                using (var stream = client.OpenRead(new Uri($"http://{ip}:80")))
+                {
+                    return Status.Online;
+                }
+            }
+            catch
+            {
+                return Status.Offline;
+            }
+        }
+
 
         // Check if "servers.txt" exists, if it does, load the servers
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -200,10 +225,7 @@ namespace CS2_Server_Browser
             string message = "";
             try
             {
-                var request =
-                    WebRequest.Create(
-                        //"https://raw.githubusercontent.com/Chopper1337/CS2-Server-Browser/master/message");
-                        uri);
+                var request = WebRequest.Create(uri);
                 var response = request.GetResponse();
                 var dataStream = response.GetResponseStream();
                 var reader = new StreamReader(dataStream);
@@ -213,7 +235,7 @@ namespace CS2_Server_Browser
             }
             catch (Exception)
             {
-                // ignored
+                return "";
             }
             return message;
         }
