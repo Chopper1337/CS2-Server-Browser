@@ -90,6 +90,7 @@ namespace CS2_Server_Browser
         {
             InitializeComponent();
 
+            StatusMessageTextBlock.Text = "Loading list headers...";
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Location", Binding = new Binding("location") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("name") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "IP", Binding = new Binding("ip") });
@@ -101,14 +102,17 @@ namespace CS2_Server_Browser
             LanguageComboBox.ItemsSource = languages;
             FreqComboBox.ItemsSource = monitorFrequencies;
             ThreadsComboBox.ItemsSource = FindThreads();
+            StatusMessageTextBlock.Text = "Loading combo boxes...";
 
             // Set saved values
             PriorityComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Priority;
             LanguageComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Language;
             FreqComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Frequency;
             ThreadsComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Threads;
+            StatusMessageTextBlock.Text = "Loading saved settings...";
 
-            MessageTextBlock.Text = GetCustomMessage();
+            MessageTextBlock.Text =
+                DownloadText("https://raw.githubusercontent.com/Chopper1337/CS2-Server-Browser/master/message");
 
             ready = true;
 
@@ -129,6 +133,7 @@ namespace CS2_Server_Browser
         // Verify executable file
         private bool VerifyGameExecutable()
         {
+            StatusMessageTextBlock.Text = "Verifying CS2.exe exists...";
             if (!File.Exists(gameExecutable))
             {
                 MessageBox.Show("CS2.exe not found!");
@@ -141,6 +146,7 @@ namespace CS2_Server_Browser
         // Fill the "servers" list with servers from a file named "servers.txt"
         private void LoadServers(object sender, RoutedEventArgs e)
         {
+            StatusMessageTextBlock.Text = "Loading servers.txt...";
             StreamReader reader = new StreamReader("servers.txt");
             // For each line in the file, create a new server and add it to the list
             foreach (var line in File.ReadLines("servers.txt"))
@@ -169,7 +175,10 @@ namespace CS2_Server_Browser
         // Check if "servers.txt" exists, if it does, load the servers
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!File.Exists("servers.txt")) return;
+            if (!File.Exists("servers.txt"))
+                // Download the file from Github
+                using (var client = new WebClient())
+                    client.DownloadFile("https://raw.githubusercontent.com/Chopper1337/CS2-Server-Browser/master/servers.txt", "servers.txt");
 
             if (new FileInfo("servers.txt").Length != 0)
                 LoadServers(sender, e);
@@ -194,26 +203,30 @@ namespace CS2_Server_Browser
             string priority = PriorityComboBox.SelectedValue.ToString().Split(':')[0];
             StartGame(threads, freq, lang, priority, ip, port);
             
-            MessageBox.Show("Connecting to " + selectedServer.ip);
+            StatusMessageTextBlock.Text = "Connecting to " + selectedServer.ip;
         }
 
         // Ping the selected server and return its status (Online/Offline)
         private Status Ping(string ip)
         {
+            StatusMessageTextBlock.Text = $"Pinging {ip}...";
             var pingSender = new Ping();
             var reply = pingSender.Send(ip);
             return reply != null && reply.Status == IPStatus.Success ? Status.Online : Status.Offline;
         }
 
-        // Pull a custom message from a file in the GitHub repo
-        private string GetCustomMessage()
+
+        // Pull text from a URI
+        private string DownloadText(string uri)
         {
+            StatusMessageTextBlock.Text = "Loading custom message from GitHub...";
             string message = "";
             try
             {
                 var request =
                     WebRequest.Create(
-                        "https://raw.githubusercontent.com/Chopper1337/CS2-Server-Browser/master/message");
+                        //"https://raw.githubusercontent.com/Chopper1337/CS2-Server-Browser/master/message");
+                        uri);
                 var response = request.GetResponse();
                 var dataStream = response.GetResponseStream();
                 var reader = new StreamReader(dataStream);
@@ -231,6 +244,7 @@ namespace CS2_Server_Browser
         // Find the location of the IP
         private string FindLocation(string ip)
         {
+            StatusMessageTextBlock.Text = $"Locating {ip}...";
             string location = "Unknown";
             try
             {
@@ -254,6 +268,7 @@ namespace CS2_Server_Browser
         // Save settings when the window is closed
         private void SettingChanged(object sender, RoutedEventArgs e)
         {
+            StatusMessageTextBlock.Text = $"Saving settings...";
             if (!ready) return;
             CS2_Server_Browser.Properties.Settings.Default.Priority = PriorityComboBox.SelectedValue.ToString();
             CS2_Server_Browser.Properties.Settings.Default.Language = LanguageComboBox.SelectedValue.ToString();

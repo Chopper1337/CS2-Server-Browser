@@ -19,10 +19,18 @@
         Loaded="Window_Loaded">
     <Grid>
     <Grid.RowDefinitions>
-        <RowDefinition Height="7*"></RowDefinition>
-        <RowDefinition Height="4*"></RowDefinition>
+        <RowDefinition Height="70*"></RowDefinition>
+        <RowDefinition Height="40*"></RowDefinition>
+        <RowDefinition Height="8*"></RowDefinition>
     </Grid.RowDefinitions>
-
+    <Grid Grid.Row="2" Margin="10,2,10,2">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="18*"></ColumnDefinition>
+        <ColumnDefinition Width="80*"></ColumnDefinition>
+    </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0"  Style="{DynamicResource MaterialDesignBody1TextBlock}" Foreground="AliceBlue">Last executed task:</TextBlock>
+        <TextBlock Grid.Column="1" Name="StatusMessageTextBlock" Style="{DynamicResource MaterialDesignBody1TextBlock}" Foreground="AliceBlue">Status message</TextBlock>
+    </Grid>
         <DataGrid Margin="10" AllowDrop="False" Name="ServerDataGrid" IsReadOnly="True" CanUserSortColumns="True" AutoGenerateColumns="True"/>
         <Grid Grid.Row="1" Margin="10">
             <Grid.ColumnDefinitions>
