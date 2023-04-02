@@ -2,22 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml.Linq;
-using Newtonsoft.Json.Linq;
 
 namespace CS2_Server_Browser
 {
@@ -141,7 +129,7 @@ namespace CS2_Server_Browser
             }
 
             return true;
-        }   
+        }
 
         // Fill the "servers" list with servers from a file named "servers.txt"
         private void LoadServers(object sender, RoutedEventArgs e)
@@ -154,12 +142,11 @@ namespace CS2_Server_Browser
                 var serverData = line.Split(',');
                 var server = new Server
                 {
-                    name = serverData[0],
-                    ip = serverData[1],
-                    port = serverData[2],
-                    gamemode = (Gamemode)Enum.Parse(typeof(Gamemode), serverData[3]),
-                    location = FindLocation(serverData[1]),
-                    status = Ping(serverData[1])
+                    location = serverData[0],
+                    name = serverData[1],
+                    ip = serverData[2],
+                    port = serverData[3],
+                    gamemode = (Gamemode)Enum.Parse(typeof(Gamemode), serverData[4])
                 };
 
                 servers.Add(server);
@@ -193,7 +180,7 @@ namespace CS2_Server_Browser
         private void Connect(object sender, RoutedEventArgs e)
         {
             if (!VerifyGameExecutable()) return;
-            if(!(ServerDataGrid.SelectedItem is Server selectedServer)) return;
+            if (!(ServerDataGrid.SelectedItem is Server selectedServer)) return;
 
             string ip = selectedServer.ip;
             string port = selectedServer.port;
@@ -202,19 +189,9 @@ namespace CS2_Server_Browser
             string lang = LanguageComboBox.SelectedValue.ToString().Split(':')[0];
             string priority = PriorityComboBox.SelectedValue.ToString().Split(':')[0];
             StartGame(threads, freq, lang, priority, ip, port);
-            
+
             StatusMessageTextBlock.Text = "Connecting to " + selectedServer.ip;
         }
-
-        // Ping the selected server and return its status (Online/Offline)
-        private Status Ping(string ip)
-        {
-            StatusMessageTextBlock.Text = $"Pinging {ip}...";
-            var pingSender = new Ping();
-            var reply = pingSender.Send(ip);
-            return reply != null && reply.Status == IPStatus.Success ? Status.Online : Status.Offline;
-        }
-
 
         // Pull text from a URI
         private string DownloadText(string uri)
@@ -239,30 +216,6 @@ namespace CS2_Server_Browser
                 // ignored
             }
             return message;
-        }
-
-        // Find the location of the IP
-        private string FindLocation(string ip)
-        {
-            StatusMessageTextBlock.Text = $"Locating {ip}...";
-            string location = "Unknown";
-            try
-            {
-                var request = WebRequest.Create("http://ip-api.com/json/" + ip);
-                var response = request.GetResponse();
-                var dataStream = response.GetResponseStream();
-                var reader = new StreamReader(dataStream);
-                var responseFromServer = reader.ReadToEnd();
-                var json = JObject.Parse(responseFromServer);
-                location = json["country"].ToString();
-                reader.Close();
-                response.Close();
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
-            return location;
         }
 
         // Save settings when the window is closed
