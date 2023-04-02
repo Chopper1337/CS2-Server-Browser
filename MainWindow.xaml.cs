@@ -93,6 +93,7 @@ namespace CS2_Server_Browser
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Location", Binding = new Binding("location") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("name") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "IP", Binding = new Binding("ip") });
+            ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Port", Binding = new Binding("port") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Gamemode", Binding = new Binding("gamemode") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Status", Binding = new Binding("status") });
 
@@ -106,6 +107,8 @@ namespace CS2_Server_Browser
             LanguageComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Language;
             FreqComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Frequency;
             ThreadsComboBox.SelectedItem = CS2_Server_Browser.Properties.Settings.Default.Threads;
+
+            MessageTextBlock.Text = GetCustomMessage();
 
             ready = true;
 
@@ -182,6 +185,7 @@ namespace CS2_Server_Browser
         {
             if (!VerifyGameExecutable()) return;
             if(!(ServerDataGrid.SelectedItem is Server selectedServer)) return;
+
             string ip = selectedServer.ip;
             string port = selectedServer.port;
             string threads = ThreadsComboBox.SelectedValue.ToString().Split(':')[0];
@@ -199,6 +203,29 @@ namespace CS2_Server_Browser
             var pingSender = new Ping();
             var reply = pingSender.Send(ip);
             return reply != null && reply.Status == IPStatus.Success ? Status.Online : Status.Offline;
+        }
+
+        // Pull a custom message from a file in the GitHub repo
+        private string GetCustomMessage()
+        {
+            string message = "";
+            try
+            {
+                var request =
+                    WebRequest.Create(
+                        "https://raw.githubusercontent.com/Chopper1337/CS2-Server-Browser/master/message");
+                var response = request.GetResponse();
+                var dataStream = response.GetResponseStream();
+                var reader = new StreamReader(dataStream);
+                message = reader.ReadToEnd();
+                reader.Close();
+                response.Close();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            return message;
         }
 
         // Find the location of the IP
