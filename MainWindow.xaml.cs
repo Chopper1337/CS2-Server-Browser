@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,6 +16,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace CS2_Server_Browser
 {
@@ -90,6 +94,7 @@ namespace CS2_Server_Browser
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("name") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "IP", Binding = new Binding("ip") });
             ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Gamemode", Binding = new Binding("gamemode") });
+            ServerDataGrid.Columns.Add(new DataGridTextColumn { Header = "Status", Binding = new Binding("status") });
 
             PriorityComboBox.ItemsSource = priorityLevels;
             LanguageComboBox.ItemsSource = languages;
@@ -143,8 +148,10 @@ namespace CS2_Server_Browser
                     name = serverData[0],
                     ip = serverData[1],
                     gamemode = (Gamemode)Enum.Parse(typeof(Gamemode), serverData[2]),
-                    location = serverData[3]
+                    location = FindLocation(serverData[1]),
+                    status = Ping(serverData[1])
                 };
+
                 servers.Add(server);
             }
 
@@ -182,6 +189,37 @@ namespace CS2_Server_Browser
             StartGame(threads, freq, lang, priority, ip);
             
             MessageBox.Show("Connecting to " + selectedServer.ip);
+        }
+
+        // Ping the selected server and return its status (Online/Offline)
+        private Status Ping(string ip)
+        {
+            var pingSender = new Ping();
+            var reply = pingSender.Send(ip);
+            return reply != null && reply.Status == IPStatus.Success ? Status.Online : Status.Offline;
+        }
+
+        // Find the location of the IP
+        private string FindLocation(string ip)
+        {
+            string location = "Unknown";
+            try
+            {
+                var request = WebRequest.Create("http://ip-api.com/json/" + ip);
+                var response = request.GetResponse();
+                var dataStream = response.GetResponseStream();
+                var reader = new StreamReader(dataStream);
+                var responseFromServer = reader.ReadToEnd();
+                var json = JObject.Parse(responseFromServer);
+                location = json["country"].ToString();
+                reader.Close();
+                response.Close();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            return location;
         }
 
         // Save settings when the window is closed
